@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tri-Expert Detection Suite - Upload & Detect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .upload-section {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-section:hover {
+            background: #f8f9ff;
+            border-color: #764ba2;
+        }
+
+        .upload-section.dragover {
+            background: #eef2ff;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #667eea;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .file-name {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .btn-detect {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .btn-detect:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-detect:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .result-section.real {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .result-section.fake {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+        }
+
+        .result-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .confidence-bar {
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .preview-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            background: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🛡️ Tri-Expert Detection Suite</h1>
+        <p class="subtitle">Enter the era of AI-proof forensics with our advanced detection engine</p>
+
+        <div class="upload-section" id="uploadSection">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Drag & Drop your file here</div>
+            <div class="upload-hint">or click to browse (MP4, JPG, PNG)</div>
+            <input type="file" id="fileInput" accept="image/*,video/*">
+        </div>
+
+        <div class="file-info" id="fileInfo">
+            <div class="file-name" id="fileName"></div>
+            <div class="file-size" id="fileSize"></div>
+            <div class="preview-container" id="previewContainer"></div>
+        </div>
+
+        <button class="btn-detect" id="detectBtn" disabled>
+            🔍 Detect DeepFake
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Analyzing content...</div>
+            <div style="color: #666; margin-top: 10px;">Our AI is examining facial features and artifacts</div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-title" id="resultTitle"></div>
+            <div id="resultDetails"></div>
+            <div class="confidence-bar">
+                <div class="confidence-fill" id="confidenceBar"></div>
+            </div>
+            <div id="resultMessage" style="text-align: center; margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const previewContainer = document.getElementById('previewContainer');
+        const detectBtn = document.getElementById('detectBtn');
+        const loading = document.getElementById('loading');
+        const resultSection = document.getElementById('resultSection');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultDetails = document.getElementById('resultDetails');
+        const confidenceBar = document.getElementById('confidenceBar');
+        const resultMessage = document.getElementById('resultMessage');
+
+        let selectedFile = null;
+
+        // Drag and drop handlers
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        uploadSection.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            selectedFile = file;
+
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/png', 'video/mp4'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload a valid file (JPG, PNG, or MP4)');
+                return;
+            }
+
+            // Display file info
+            fileName.textContent = `📄 ${file.name}`;
+            fileSize.textContent = `Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            fileInfo.style.display = 'block';
+            detectBtn.disabled = false;
+
+            // Show preview
+            previewContainer.innerHTML = '';
+            const previewUrl = URL.createObjectURL(file);
+
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = previewUrl;
+                img.className = 'preview-image';
+                previewContainer.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = previewUrl;
+                video.className = 'video-preview';
+                video.controls = true;
+                previewContainer.appendChild(video);
+            }
+
+            // Hide previous results
+            resultSection.style.display = 'none';
+        }
+
+        detectBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            // Show loading
+            loading.style.display = 'block';
+            detectBtn.disabled = true;
+            resultSection.style.display = 'none';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                // Call actual backend API
+                const response = await fetch('/api/detect', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Detection failed: ' + response.statusText);
+                }
+
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                alert('Error analyzing file: ' + error.message);
+                console.error(error);
+                loading.style.display = 'none';
+                detectBtn.disabled = false;
+            }
+        });
+
+        function displayResult(result) {
+            resultSection.style.display = 'block';
+
+            if (result.is_fake) {
+                resultSection.className = 'result-section fake';
+                resultTitle.textContent = '⚠️ Likely DEEPFAKE Detected';
+                resultTitle.style.color = '#dc3545';
+                resultMessage.textContent = 'This content shows signs of AI manipulation';
+            } else {
+                resultSection.className = 'result-section real';
+                resultTitle.textContent = '✅ Content Appears REAL';
+                resultTitle.style.color = '#28a745';
+                resultMessage.textContent = 'No significant manipulation detected';
+            }
+
+            const confidencePercent = (result.confidence * 100).toFixed(1);
+            confidenceBar.style.width = `${confidencePercent}%`;
+            confidenceBar.textContent = `${confidencePercent}% Confidence`;
+
+            // Removed technical analysis score display as per user request
+            resultDetails.innerHTML = '';
+        }
+    </script>
+</body>
+
+</html>
