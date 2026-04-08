@@ -15,8 +15,8 @@ print("="*70 + "\n")
 # Test 1: Model Architecture
 print("Test 1: Loading Model Architecture...")
 try:
-    model = DeepFakeClassifier(encoder='tf_efficientnet_b5_ns')
-    print(f"✅ Model loaded: EfficientNet B5")
+    model = DeepFakeClassifier(encoder='tf_efficientnet_b7_ns')
+    print(f"[SUCCESS] Model loaded: EfficientNet B7 (TriExpert)")
     print(f"   Parameters: {sum(p.numel() for p in model.parameters()):,}")
     model.eval()
 except Exception as e:

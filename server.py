@@ -36,6 +36,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Load model ensemble (picking top 3 for speed/accuracy balance on CPU)
 import re
+# Load model ensemble (picking top 3 for speed/accuracy balance on CPU)
+import re
 ENSEMBLE_WEIGHTS = [
     os.path.join('weights', 'final_111_DeepFakeClassifier_tf_efficientnet_b7_ns_0_36'),
     os.path.join('weights', 'final_555_DeepFakeClassifier_tf_efficientnet_b7_ns_0_19'),

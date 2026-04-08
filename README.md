@@ -1,76 +1,110 @@
-# 🛡️ Tri-Expert Detection Suite — Professional Forensic AI
+# TriExpert Deepfake Detection System
 
-A cutting-edge deepfake detection system leveraging high-performance neural networks to identify AI-generated video and image content with professional-grade accuracy.
+A professional deepfake detection system using ensemble learning with EfficientNet-B7 to identify AI-generated video content with state-of-the-art accuracy.
 
 ---
 
-## � System Architecture & Workflow
+## System Overview
 
-### 📋 Processing Pipeline
-The following system flowchart illustrates the high-performance detection strategy used by our suite:
+The TriExpert Detection Suite uses three independent EfficientNet-B7 models trained with different random seeds (111, 555, 777) to achieve robust deepfake detection through ensemble voting.
 
-![System Flowchart](images/system_flowchart.png)
+### Architecture
 
+- **Backbone**: EfficientNet-B7 (tf_efficientnet_b7_ns)
+- **Input**: 380x380 RGB images
+- **Ensemble**: 3 models with weighted voting [0.36, 0.32, 0.32]
+- **Face Detection**: MTCNN with temporal smoothing
+- **Performance**: 99.12% accuracy on DFDC dataset
 
-### 🧠 Logic Comparison (Baseline vs Tri-Expert)
-How our custom-trained suite outperforms the standard industry baseline:
+---
 
-```mermaid
-graph LR
-    subgraph Baseline Reference
-    B1[Single B5 Model] --> B2[Average Score] --> B3[Final Answer]
-    end
+## Quick Start
 
-    subgraph Tri-Expert Suite
-    T1[3x B7 Ensemble] --> T2[Parallel Analysis] --> T3[Confident Voting] --> T4[Final Consensus]
-    end
+### Prerequisites
+- Python 3.8+
+- NVIDIA GPU (recommended)
+- PyTorch 1.10+
 
-    style Baseline Reference fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style Tri-Expert Suite fill:#eef2ff,stroke:#2F81F7,stroke-width:4px
+### Installation
+
+1. Install dependencies:
+```bash
+pip install torch torchvision opencv-python albumentations timm facenet-pytorch tqdm pandas scikit-learn flask
 ```
 
----
-
-## �🚀 Key Features
-
-- **State-of-the-art Frame Analysis**: Powered by **Tri-Expert Architecture** (B7-NS) ensembles.
-- **Intelligent Face Detection**: Integrated MTCNN face extractor with professional landmarks.
-- **Advanced Forensic Strategy**: Implements **Confident Strategy Voting** for maximum accuracy.
-- **Fast Inference**: Optimized for both single frame and full video sequence analysis.
-- **Premium Web Interface**: Clean, responsive, and intuitive dashboard for forensic teams.
-
----
-
-## 🛠️ Quick Start
-
-### 1. Prerequisites
-- **Python 3.8+**
-- **NVIDIA GPU** (Highly recommended, but CPU is supported)
-
-### 2. Dependencies & Weights
-Install analysis tools and download the necessary weights:
-```powershell
-./install_and_run.bat
+2. Download model weights:
+```bash
 python download_weights.py
 ```
 
-### 3. Running the Application
-Launch the backend server:
-```powershell
+### Usage
+
+**Single video prediction:**
+```bash
+python demo.py --video test.mp4 --weights \
+    weights/final_111_DeepFakeClassifier_tf_efficientnet_b7_ns_0_36 \
+    weights/final_555_DeepFakeClassifier_tf_efficientnet_b7_ns_0_19 \
+    weights/final_777_DeepFakeClassifier_tf_efficientnet_b7_ns_0_29
+```
+
+**Batch processing:**
+```bash
+python predict_folder.py --test-dir /path/to/videos --output results.csv
+```
+
+**Web interface:**
+```bash
 python server.py
 ```
-Open your browser and navigate to `http://localhost:5000` to start detecting.
+Then open `http://localhost:5000` in your browser.
 
 ---
 
-## 🔬 Core Technologies
+## Training
 
-- **Architecture**: Deep Neural Ensembles (Tri-Expert B7-NS)
-- **Frameworks**: PyTorch, OpenCV, Flask, Albumentations
-- **Preprocessing**: 33% Padded MTCNN Face Landmarks & Isotropic Resizing
-- **Voting Strategy**: Confident Strategy Weighted Consensus
+To train the TriExpert models from scratch:
+
+```bash
+# Train all 3 models (requires GPU)
+bash train.sh /path/to/dataset 1
+```
 
 ---
 
-Developed by the Deepfake Project Team as a professional solution for AI content verification and forensic analysis.
+## Project Structure
 
+```
+├── configs/                 # Configuration files
+├── preprocessing/           # Face detection and video processing
+├── training/               # Training pipelines and models
+│   ├── datasets/           # Data loading utilities
+│   ├── pipelines/          # Training scripts
+│   ├── sgd/                # Optimizer utilities
+│   └── zoo/                # Model architectures
+├── weights/                # Model checkpoints (download separately)
+├── demo.py                 # Single video prediction
+├── predict_folder.py       # Batch prediction
+├── server.py               # Web interface
+├── download_weights.py     # Weight downloader
+└── train.sh                # Training script
+```
+
+---
+
+## Core Technologies
+
+- **Deep Learning**: PyTorch
+- **Architecture**: EfficientNet-B7 (timm)
+- **Data Augmentation**: Albumentations
+- **Face Detection**: MTCNN (facenet-pytorch)
+- **Web Framework**: Flask
+
+---
+
+## License
+
+See LICENSE file for details.
+
+---
+
+Developed for professional AI content verification and forensic analysis.
