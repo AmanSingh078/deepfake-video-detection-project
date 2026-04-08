@@ -101,10 +101,3 @@ bash train.sh /path/to/dataset 1
 
 ---
 
-## License
-
-See LICENSE file for details.
-
----
-
-Developed for professional AI content verification and forensic analysis.
